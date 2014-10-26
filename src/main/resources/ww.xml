@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans     
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/task     
+    http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+    default-autowire="byName">
+       
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		
+		<!-- 
+		<property name="jdbcUrl">
+			<value>jdbc:mysql://127.0.0.1/wwerp?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+		</property>
+		<property name="user">
+			<value>im</value>
+		</property>
+		<property name="password">
+			<value>im</value>
+		</property> -->
+		
+		<property name="jdbcUrl">
+			<value>jdbc:mysql://115.28.171.5/wwerp?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+		</property>
+		<property name="user">
+			<value>davy_test</value>
+		</property>
+		<property name="password">
+			<value>97418217</value>
+		</property>
+	 
+		<property name="minPoolSize">
+			<value>5</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>15</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>28</value>
+		</property>
+		<property name="breakAfterAcquireFailure">
+			<value>true</value>
+		</property>
+		<property name="checkoutTimeout">
+			<value>5000</value>
+		</property>
+		<property name="acquireRetryAttempts">
+			<value>100000</value>
+		</property>
+		<property name="acquireRetryDelay">
+			<value>5000</value>
+		</property>
+	</bean>
+
+	<bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="wwDao" class="cn.wwerp.WWDao">
+		<property name="jt" ref="jt" />
+	</bean>
+	
+	<bean id="cacheManager"	class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation">
+			<value>classpath:ehcache.xml</value>
+		</property>
+	</bean>
+	<bean id="eCacheTypes"
+		class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+		lazy-init="default" autowire="default" >
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="cacheName" value="eCacheTypes" />
+		<property name="maxElementsInMemory" value="1000" />
+		<property name="memoryStoreEvictionPolicy" value="LRU" />
+		<property name="overflowToDisk" value="false" />
+		<property name="timeToIdle" value="86400" />
+		<property name="timeToLive" value="86400" />
+	</bean>
+	<bean id="eCacheTypeClasses"
+		class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+		lazy-init="default" autowire="default">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="cacheName" value="eCacheTypeClasses" />
+		<property name="maxElementsInMemory" value="1000" />
+		<property name="memoryStoreEvictionPolicy" value="LRU" />
+		<property name="overflowToDisk" value="false" />
+		<property name="timeToIdle" value="120" />
+		<property name="timeToLive" value="120" />
+	</bean>
+	<bean id="eCacheItemDetail"
+		class="org.springframework.cache.ehcache.EhCacheFactoryBean"
+		lazy-init="default" autowire="default">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="cacheName" value="eCacheItemDetail" />
+		<property name="maxElementsInMemory" value="1000" />
+		<property name="memoryStoreEvictionPolicy" value="LRU" />
+		<property name="overflowToDisk" value="false" />
+		<property name="timeToIdle" value="86400" />
+		<property name="timeToLive" value="86400" />
+	</bean>
+	
+	<bean id="cacheTypes" class="cn.wwerp.util.Cache">
+	    <property name="localCache" ref="eCacheTypes" />
+	</bean>
+	<bean id="cacheTypeClasses" class="cn.wwerp.util.Cache">
+	    <property name="localCache" ref="eCacheTypeClasses" />
+	</bean>
+	<bean id="cacheItemDetail" class="cn.wwerp.util.Cache">
+	    <property name="localCache" ref="eCacheItemDetail" />
+	</bean>
+	
+	<bean id="wwService" class="cn.wwerp.WWService">
+	    <property name="dao" ref="wwDao" />
+	    <property name="cacheTypes" ref="cacheTypes" />
+	    <property name="cacheTypeClasses" ref="cacheTypeClasses" />
+	    <property name="cacheItemDetail" ref="cacheItemDetail" />
+	</bean>
+</beans>
