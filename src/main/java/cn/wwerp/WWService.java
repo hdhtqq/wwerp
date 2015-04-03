@@ -70,6 +70,16 @@ public class WWService {
 		return list;
 	}
 	
+	public List<ItemType> getTypesByClassId(int classId) {
+		List<ItemType> all = getTypes();
+		List<ItemType> list = new ArrayList<ItemType>();
+		for (ItemType item : all) {
+			if (item.ClassId == classId)
+				list.add(item);
+		}
+		return list;
+	}
+	
 	public ItemType getItemType(int id) {
 		List<ItemType> all = getTypes();
 		for (ItemType item : all) {
@@ -127,7 +137,7 @@ public class WWService {
 	public List<ItemDetail> getItemDetails(int itemId, int type) {
 		List<ItemDetail> all = cacheItemDetail.get(itemId);
 		if (all == null) {
-			String sql = "select * from ItemDetail where ItemId=?";
+			String sql = "select a.*, b.ClassId from ItemDetail a,ItemType b where a.TypeId=b.Id and ItemId=? order by ClassId,TypeId";
 			all = dao.queryList(ItemDetail.class, sql,	new Object[]{itemId});
 			cacheItemDetail.set(itemId, all);
 		}
@@ -167,8 +177,6 @@ public class WWService {
 		if (item.Id > 0) {
 			for (ItemDetail d : details) {
 				if (d.Id > 0) {
-					if (d.Id == 788)
-						d.Id = 788;
 					ItemDetail old = getItemDetail(item.Id, d.Id);
 					if (!isFloadEqual(old.Price, d.Price) || !isFloadEqual(old.Quantity, d.Quantity)
 							|| !isFloadEqual(old.Amount, d.Amount) || !old.Remark.equals(d.Remark)) {
@@ -184,6 +192,13 @@ public class WWService {
 				}
 			}
 		}
+		
+		// 计算总收入和支出
+		String sql = "select sum(a.Amount) from ItemDetail a,ItemType b where b.Id=a.TypeId and b.Type=? and a.ItemId=?";
+		int totalIncoming = dao.queryForInt(sql, new Object[]{1, item.Id});
+		int totalOutgoing = dao.queryForInt(sql, new Object[]{2, item.Id});
+		dao.update("update Item set TotalIncoming=?,TotalOutgoing=?,RemainAmount=PrepareAmount+? where Id=?",
+				new Object[]{totalIncoming, totalOutgoing, totalIncoming-totalOutgoing, item.Id});
 		
 		cacheItemDetail.remove(item.Id);
 		t = System.currentTimeMillis() - t;

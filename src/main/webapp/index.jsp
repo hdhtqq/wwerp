@@ -138,6 +138,11 @@ a:hover {
 					<div id="accordion">
 						<h3>菜单</h3>
 						<div>
+							<% if ("tqq".equals(loginUid)) { %>
+						    <div class="menu_1">
+								<a href="search.jsp" target="main">分类搜索</a>
+							</div>
+							<% } %>
 							<div class="menu_1">
 								<a href="additem.jsp" target="main">每日账单</a>
 							</div>

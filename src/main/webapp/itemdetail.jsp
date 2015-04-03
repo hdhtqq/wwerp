@@ -1,3 +1,4 @@
+<%@page import="cn.wwerp.TypeClass"%>
 <%@page import="java.util.Date"%>
 <%@page import="cn.wwerp.Item"%>
 <%@page import="cn.wwerp.ItemDetail"%>
@@ -58,23 +59,30 @@ $(function() {
         <tbody>
         	<tr>
         		<th width="10%">序号</th>
-        		<th width="20%">项目</th>
+        		<th width="10%">分类</th>
+        		<th width="10%">项目</th>
         		<th width="10%">单价</th>
         		<th width="10%">数量</th>
         		<th width="10%">总金额</th>
+        		<th width="10%">合计</th>
         		<th>备注</th>
         	</tr>
         <% 
+            float total = 0;
         	for (int idx=0; idx<incomings.size(); idx++) {
         		ItemDetail d = incomings.get(idx);
         		ItemType type = wwService.getItemType(d.TypeId);
+        		TypeClass c = wwService.getTypeClass(type.ClassId);
+        		total += d.Amount;
         		%>
             <tr height="30px">
                 <td>&nbsp;<%=idx+1 %>&nbsp;</td>
+                <td>&nbsp;<%=c.Name %>&nbsp;</td>
 				<td>&nbsp;<%=type.Name %>&nbsp;</td>
 				<td><%=Util.trimNumber(d.Price) %>&nbsp;元</td>
 				<td>&nbsp;&nbsp;<%=Util.trimNumber(d.Quantity) %>&nbsp;<%=type.Unit %></td>
 				<td><%=Util.trimNumber(d.Amount) %>&nbsp;元</td>
+				<td><%=Util.trimNumber(total) %>&nbsp;元</td> 
 				<td>&nbsp;<%=d.Remark %>&nbsp;</td>
 			</tr>
 		<%} %>
@@ -82,10 +90,12 @@ $(function() {
                 <td>&nbsp;</td>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
+				<td>&nbsp;</td>
 				<td>&nbsp;合计&nbsp;</td>
 				<td>
 					<span id="SpanTotalIncoming"><%=Util.trimNumber(item.TotalIncoming) %></span>&nbsp;元
 				</td>
+				<td><%=Util.trimNumber(total) %>&nbsp;元</td>
 				<td>&nbsp;<%=item.IncomingRemark %>&nbsp;</td>
 			</tr>
         </tbody>
@@ -101,23 +111,30 @@ $(function() {
         <tbody>
         	<tr>
         		<th width="10%">序号</th>
+        		<th width="10%">分类</th>
         		<th width="20%">项目</th>
         		<th width="10%">单价</th>
         		<th width="10%">数量</th>
         		<th width="10%">总金额</th>
+        		<th width="10%">合计</th>
         		<th>备注</th>
         	</tr>
         <% 
+        	total = 0;
         	for (int idx=0; idx<outgoings.size(); idx++) {
         		ItemDetail d = outgoings.get(idx);
         		ItemType type = wwService.getItemType(d.TypeId);
+        		TypeClass c = wwService.getTypeClass(type.ClassId);
+        		total += d.Amount;
         		%>
             <tr height="30px">
                 <td>&nbsp;<%=idx+1 %>&nbsp;</td>
+                <td>&nbsp;<%=c.Name %>&nbsp;</td>
 				<td>&nbsp;<%=type.Name %>&nbsp;</td>
 				<td><%=Util.trimNumber(d.Price) %>&nbsp;元</td>
 				<td>&nbsp;&nbsp;<%=Util.trimNumber(d.Quantity) %>&nbsp;<%=type.Unit %></td>
 				<td><%=Util.trimNumber(d.Amount) %>&nbsp;元</td>
+				<td><%=Util.trimNumber(total) %>&nbsp;元</td>
 				<td>&nbsp;<%=d.Remark %>&nbsp;</td>
 			</tr>
 		<%} %>
@@ -125,10 +142,12 @@ $(function() {
                 <td>&nbsp;</td>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
+				<td>&nbsp;</td>
 				<td>&nbsp;合计&nbsp;</td>
 				<td>
 					<span id="SpanTotalOutgoing"><%=Util.trimNumber(item.TotalOutgoing) %></span>&nbsp;元
 				</td>
+				<td><%=Util.trimNumber(total) %>&nbsp;元</td>
 				<td>&nbsp;<%=item.OutgoingRemark %>&nbsp;</td>
 			</tr>
         </tbody>
@@ -141,7 +160,7 @@ $(function() {
         	<tr>
         		<td width="45%" style="text-align: right;"><strong>结余：</strong></td>
         		<td style="text-align: left;">
-        			<span id="SpanRemainAmount"><%=Util.trimNumber(item.RemainAmount) %></span>&nbsp;元
+        			<span id="SpanRemainAmount"><%=Util.trimNumber(item.TotalIncoming - item.TotalOutgoing) %></span>&nbsp;元
         		</td>
         	</tr>
         </tbody>

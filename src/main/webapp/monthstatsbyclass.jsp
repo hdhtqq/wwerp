@@ -7,7 +7,7 @@
 <%@ include file="/common.jsp"%>
 <%
 	String month = request.getParameter("month");
-	String title = request.getParameter("Title");
+	String title = request.getParameter("Title"); 
 	List<Item> list = wwService.getItems(month);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -45,9 +45,11 @@ $(function() {
         <% 
         	int incoming = 0;
         	int outgoing = 0;
+        	int remain = (int)(list.isEmpty() ? 0 : list.get(0).RemainAmount);
         	for (Item item : list) {
         		incoming += item.TotalIncoming;
         		outgoing += item.TotalOutgoing;
+        		remain += item.TotalIncoming - item.TotalOutgoing;
         		%>
             <tr height="30px" class="table_content_line">
                 <td>&nbsp;<%=item.ItemDate %>&nbsp;</td>
@@ -56,11 +58,8 @@ $(function() {
 				<td>&nbsp;<%=Util.trimNumber(item.TotalOutgoing)%>&nbsp;</td>
 				<td>&nbsp;<%=Util.trimNumber(item.TotalIncoming - item.TotalOutgoing)%>&nbsp;</td>
 				<td>
-					<a href="itemdetail.jsp?Id=<%=item.Id %>">【收入明细】</a>
-					<%
-					List<String> allows = Arrays.asList("2015-03-31", "2015-02-28", "2015-01-31", "2014-10-31", "2014-11-30", "2014-12-31");
-					if (item.getCreateTime().getTime() + 86400000L > System.currentTimeMillis()
-							|| allows.contains(item.ItemDate)) { %>	
+					<a href="itemdetail.jsp?Id=<%=item.Id %>">【明细】</a>
+					<% if (item.getCreateTime().getTime() + 86400000L > System.currentTimeMillis()) { %>	
 					<a href="additem.jsp?date=<%=item.ItemDate%>&Id=<%=item.Id %>&act=update">【修改】</a>
 					<%} else { %>
 					【修改】
@@ -73,7 +72,7 @@ $(function() {
                 <td>&nbsp;</td>
 				<td>&nbsp;<%=Util.trimNumber(incoming) %>&nbsp;</td>
 				<td>&nbsp;<%=Util.trimNumber(outgoing) %>&nbsp;</td>
-				<td>&nbsp;<%=Util.trimNumber(incoming - outgoing) %>&nbsp;</td>
+				<td>&nbsp;<%=Util.trimNumber(remain) %>&nbsp;</td>
 				<td>&nbsp;</td>
 			</tr>
         </tbody>

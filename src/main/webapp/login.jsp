@@ -8,8 +8,9 @@
 	String user = request.getParameter("user");
 	String pwd = request.getParameter("pwd");
 	if (user != null && pwd != null) {
-		if ("xiaozhanggui".equals(user) && "88888888".equals(pwd)) {
-			session.setAttribute(Constants.SESSION_ATTR_USER, "admin");
+		if (("xiaozhanggui".equals(user) && "123321".equals(pwd))
+				|| ("tqq".equals(user) && "20120521".equals(pwd))) {
+			session.setAttribute(Constants.SESSION_ATTR_USER, user);
 			response.sendRedirect("index.jsp");
 			return;
 		}

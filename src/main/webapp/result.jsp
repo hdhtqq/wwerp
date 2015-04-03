@@ -55,7 +55,7 @@ $(function(){
 <br/>
 <center>
 	<br/><br/>
-	<p><%=text %></p>
+	<p><font size="28"><%=text %></font></p>
 	<br/><br/>
 	<p>
 		<% if (backurl != null) { %>

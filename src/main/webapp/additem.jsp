@@ -23,6 +23,8 @@
 		}
 		
 		item.ItemDate = item.ItemDate.trim();
+		String[] ss = item.ItemDate.split("-");
+		item.ItemDate = ss[0] + "-" + (ss[1].length() == 1 ? "0" : "") + ss[1] + "-" + (ss[2].length() == 1 ? "0" : "") + ss[2];
 		
 		int count = wwDao.queryCount("select count(*) from Item where ItemDate=? and Id<>?", new Object[]{item.ItemDate, item.Id});
 		if (count > 0) {
@@ -112,12 +114,14 @@ function onAmountChange(idx) {
 	var quantityStr = trimStr($("#Quantity_" + idx).val());
 	var amountStr = trimStr($("#Amount_" + idx).val());
 	if (quantityStr == "" || quantityStr == "0" || quantityStr == "0.0" || quantityStr == "0.00") {
-		var price = parseFloat(priceStr);
-		var amount = parseFloat(amountStr);
-		var quantity = Math.round(amount / price).toFixed(2) + "";
-		quantity = quantity.replace(".00", "");
-		quantity = quantity.replace(".0", ""); 
-		$("#Quantity_" + idx).val(quantity);		
+		if (amountStr != "") {
+			var price = parseFloat(priceStr);
+			var amount = parseFloat(amountStr);
+			var quantity = Math.round(amount / price).toFixed(2) + "";
+			quantity = quantity.replace(".00", "");
+			quantity = quantity.replace(".0", ""); 
+			$("#Quantity_" + idx).val(quantity);	
+		}
 	}
 	
 	doSum();
@@ -125,18 +129,23 @@ function onAmountChange(idx) {
 
 onAmountChange(<%=i%>);
 
-var maxIdx = <%=typesIncomings.size() + typesOutgoings.size()%>;
-var maxIncomingIdx = <%=typesIncomings.size()%>;
 function doSum() {
 	var totalIncoming = 0;
 	var totalOutgoing = 0;
-	for (var i=0; i<maxIdx; i++) {
+	for (var i=0; i<10000; i++) {
+		var type = $("#Type_" + i).val();
+		if (type != "1" && type != "2")
+			break;
 		var amountStr = trimStr($("#Amount_" + i).val());
 		if (amountStr != "") {
-			if (i < maxIncomingIdx) 
+			if (type == "1") 
 				totalIncoming += parseFloat(amountStr);
 			else
 				totalOutgoing += parseFloat(amountStr);
+			if (totalIncoming <= 0) {
+				alert(amountStr);
+				break;
+			}
 		}
 	}
 	
@@ -217,6 +226,7 @@ function doSave() {
         	<%} %>
             <tr height="30px" class="table_content_line">
                 <td>&nbsp;<%=idx+1 %>&nbsp;
+                    <input type="hidden" id="Type_<%=i%>" name="Type_<%=i%>" value="1"/>
                 	<input type="hidden" name="TypeId_<%=i%>" value="<%=type.Id%>"/>
                 	<input type="hidden" name="Id_<%=i%>" value="<%=d != null ? d.Id : 0%>"/>
                 </td>
@@ -273,6 +283,7 @@ function doSave() {
         	<%} %>
             <tr height="30px" class="table_content_line">
                 <td>&nbsp;<%=idx+1 %>&nbsp;
+                    <input type="hidden" id="Type_<%=i%>" name="Type_<%=i%>" value="2"/>
                 	<input type="hidden" name="TypeId_<%=i%>" value="<%=type.Id%>"/>
                 	<input type="hidden" name="Id_<%=i%>" value="<%=d != null ? d.Id : 0%>"/>
                 </td>

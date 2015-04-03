@@ -24,7 +24,7 @@
 		</property> -->
 		
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://115.28.171.5/wwerp?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+			<value>jdbc:mysql://wwerpdb/wwerp?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
 			<value>davy_test</value>
